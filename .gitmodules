@@ -1,0 +1,3 @@
+[submodule "FoodyEvo"]
+	path = FoodyEvo
+	url = https://github.com/yimingc9/FoodyEvo.git
