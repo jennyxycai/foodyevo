@@ -55,6 +55,6 @@ def api_call(model='gpt-4-vision-preview'):
   response_content = response.choices[0].message.content
   return response_content
 
-CLIENT = set_openai_env('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')
+CLIENT = set_openai_env('')
 print(api_call())
 
