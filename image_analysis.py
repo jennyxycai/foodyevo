@@ -20,41 +20,45 @@ pip3 install nest_asyncio
 
 # SET UP YOUR OPENAI CLIENT
 def set_openai_env(api_key):
-  os.environ['OPENAI_API_KEY'] = api_key # SET YOUR OWN API KEY
+    os.environ['OPENAI_API_KEY'] = api_key  # SET YOUR OWN API KEY
 
-  api_key = os.getenv("OPENAI_API_KEY")
-  if api_key is None:
-      raise ValueError("Please set the OPENAI_API_KEY environment variable.")
-    
-  #print(api_key) # test that this env var was set
-  
-  client = openai.OpenAI(api_key=api_key)
-  return client
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key is None:
+        raise ValueError("Please set the OPENAI_API_KEY environment variable.")
+
+    # print(api_key) # test that this env var was set
+
+    client = openai.OpenAI(api_key=api_key)
+    return client
 
 
-def api_call(model='gpt-4-vision-preview'):
-  openai.api_key = os.getenv("OPENAI_API_KEY")
-  response = CLIENT.chat.completions.create(
-    model=model, 
-    messages=[
-    {"role": "system", "content": "You are an expert at identifying objects in landscape images."},
-    {"role": "user",
-      "content": [
-        {"type": "text", "text": "What’s in this image?"},
-        {
-          "type": "image_url",
-          "image_url": {
-            "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
-          },
-        },
-      ],
-    }
-  ],
-  max_tokens=1024,
-  )
-  response_content = response.choices[0].message.content
-  return response_content
+def api_call(image_url, model='gpt-4-vision-preview'):
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = CLIENT.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are an expert at identifying food ingredients in salad images."},
+            {"role": "user",
+                "content": [
+                    {"type": "text", "text": "Identify all food ingredients in this salad. Return a JSON object with the keys being the food ingredient name, and the value being an integer calorie count of this ingredient."},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_url,
+                        },
+                    },
+                ],
+             }
+        ],
+        max_tokens=1024,
+        temperature=0
+    )
+    response_content = response.choices[0].message.content
+    return response_content
+
 
 CLIENT = set_openai_env('')
-print(api_call())
+with open('images/image_list.txt', 'r') as f:
+    for image_link in f:
+        print(api_call(image_link))
 
